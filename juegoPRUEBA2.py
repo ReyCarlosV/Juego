@@ -9,8 +9,8 @@ root.geometry("400x300")  # Tamaño de la ventana
 root.config(bg="green")  # Cambiar el color de fondo de la ventana a verde
 
 # Variables globales
-posiciones_con_2 = []
-posicion_actual = None
+posiciones_con_numeros = []
+posicion_vacia = None
 botones = {}
 
 # Etiqueta de título
@@ -20,7 +20,7 @@ titulo.pack(pady=30)
 
 # Funciones para los botones
 def nuevo_juego():
-    global posiciones_con_2, posicion_actual, botones
+    global posiciones_con_numeros, posicion_vacia, botones
 
     # Crear una nueva ventana para el juego
     nueva_ventana = tk.Toplevel(root)
@@ -31,53 +31,73 @@ def nuevo_juego():
     posiciones = [(fila, columna) for fila in range(4) for columna in range(4)]
 
     # Seleccionar aleatoriamente dos posiciones para mostrar el número 2
-    posiciones_con_2 = random.sample(posiciones, 2)
-    posicion_actual = posiciones_con_2[0]  # Guardar la posición actual del "2"
+    posiciones_con_numeros = random.sample(posiciones, 2)  # Dos números "2"
+
+    # Seleccionar una posición para el espacio vacío
+    posicion_vacia = random.choice([pos for pos in posiciones if pos not in posiciones_con_numeros])
 
     # Crear un mosaico de 4x4 botones
     for fila in range(4):
         for columna in range(4):
-            if (fila, columna) in posiciones_con_2:
-                texto = "2"
+            if (fila, columna) in posiciones_con_numeros:
+                texto = "2"  # Mostrar el número "2" en las posiciones elegidas
             else:
-                texto = "0"
-
+                texto = ""  # Espacio vacío
             # Crear cada botón en la cuadrícula
             boton = tk.Button(nueva_ventana, text=texto, width=10, height=4)
             boton.grid(row=fila, column=columna, padx=5, pady=5)
             botones[(fila, columna)] = boton  # Almacenar la referencia del botón
 
 
-def mover(fila, columna):
-    global posiciones_con_2, posicion_actual
+def mover_todos(direccion):
+    global posiciones_con_numeros, posicion_vacia
 
-    # Verificar si la posición está adyacente a la posición actual
-    if (abs(fila - posicion_actual[0]) == 1 and columna == posicion_actual[1]) or \
-            (abs(columna - posicion_actual[1]) == 1 and fila == posicion_actual[0]):
-        # Cambiar el número de posición
-        botones[(fila, columna)]["text"] = "2"
-        botones[posicion_actual]["text"] = "0"
-        posicion_actual = (fila, columna)
+    fila_vacia, columna_vacia = posicion_vacia
+
+    # Definir los movimientos según la dirección presionada
+    if direccion == "Up" and fila_vacia < 3:
+        fila_a_mover = fila_vacia + 1
+        if (fila_a_mover, columna_vacia) in posiciones_con_numeros:
+            boton_a_mover = (fila_a_mover, columna_vacia)
+            mover_boton(boton_a_mover)
+
+    elif direccion == "Down" and fila_vacia > 0:
+        fila_a_mover = fila_vacia - 1
+        if (fila_a_mover, columna_vacia) in posiciones_con_numeros:
+            boton_a_mover = (fila_a_mover, columna_vacia)
+            mover_boton(boton_a_mover)
+
+    elif direccion == "Left" and columna_vacia < 3:
+        columna_a_mover = columna_vacia + 1
+        if (fila_vacia, columna_a_mover) in posiciones_con_numeros:
+            boton_a_mover = (fila_vacia, columna_a_mover)
+            mover_boton(boton_a_mover)
+
+    elif direccion == "Right" and columna_vacia > 0:
+        columna_a_mover = columna_vacia - 1
+        if (fila_vacia, columna_a_mover) in posiciones_con_numeros:
+            boton_a_mover = (fila_vacia, columna_a_mover)
+            mover_boton(boton_a_mover)
+
+
+def mover_boton(boton_a_mover):
+    global posiciones_con_numeros, posicion_vacia
+
+    # Mover el número "2" al espacio vacío
+    botones[boton_a_mover]["text"] = ""
+    botones[posicion_vacia]["text"] = "2"
+
+    # Actualizar las posiciones
+    posiciones_con_numeros.remove(boton_a_mover)
+    posiciones_con_numeros.append(posicion_vacia)
+
+    # Actualizar la nueva posición vacía
+    posicion_vacia = boton_a_mover
 
 
 def key_press(event):
-    global posiciones_con_2, posicion_actual
-
-    # Mover el "2" según la tecla presionada
-    if event.keysym == 'Up':
-        nueva_fila, nueva_columna = posicion_actual[0] - 1, posicion_actual[1]
-    elif event.keysym == 'Down':
-        nueva_fila, nueva_columna = posicion_actual[0] + 1, posicion_actual[1]
-    elif event.keysym == 'Left':
-        nueva_fila, nueva_columna = posicion_actual[0], posicion_actual[1] - 1
-    elif event.keysym == 'Right':
-        nueva_fila, nueva_columna = posicion_actual[0], posicion_actual[1] + 1
-    else:
-        return
-
-    # Verificar si la nueva posición está dentro de los límites y mover
-    if 0 <= nueva_fila < 4 and 0 <= nueva_columna < 4:
-        mover(nueva_fila, nueva_columna)
+    if event.keysym in ['Up', 'Down', 'Left', 'Right']:
+        mover_todos(event.keysym)
 
 
 def salir():
@@ -86,8 +106,7 @@ def salir():
 
 # Función para mostrar las instrucciones del juego
 def mostrar_instrucciones():
-    messagebox.showinfo("Cómo jugar",
-                        "Instrucciones del juego:\n\n1. Usa las flechas del teclado para mover el número '2'.\n2. Los ceros son espacios vacíos.\n3. ¡Gana el juego!")
+    messagebox.showinfo("Cómo jugar","Instrucciones del juego:\n\n1. Usa las flechas del teclado para mover los números '2' hacia el espacio vacío.\n2. ¡Gana el juego!")
 
 
 # Botón para "Nuevo juego"
