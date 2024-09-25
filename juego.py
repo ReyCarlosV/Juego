@@ -32,7 +32,7 @@ def nuevo_juego():
     # Crear una nueva ventana para el juego
     nueva_ventana = tk.Toplevel(root)
     nueva_ventana.title("Nuevo Juego")
-    nueva_ventana.geometry("400x500")
+    nueva_ventana.geometry("360x380")
 
     # Crear una lista de 16 posiciones (4x4)
     posiciones = [(fila, columna) for fila in range(4) for columna in range(4)]
