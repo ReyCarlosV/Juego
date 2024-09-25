@@ -1,21 +1,21 @@
 import tkinter as tk
-from tkinter import messagebox
 import random
+from tkinter import messagebox
 
 # Crear la ventana principal
 root = tk.Tk()
-root.title("2048")
-root.geometry("820x460")  # Tamaño de la ventana
-root.config(bg="green")  # Cambiar el color de fondo de la ventana a verde
+root.title("Portada de Inicio")
+root.geometry("400x300")
+root.config(bg="green")
 
 # Variables globales
-posiciones_con_numeros = []
+posiciones_con_numeros = {}
 botones = {}
 marcador = 0
 
 # Etiqueta de título
-titulo = tk.Label(root, text="¡Bienvenido a mi 2048!", font=("Helvetica", 20), bg="green", fg="white")
-titulo.pack(pady=50)
+titulo = tk.Label(root, text="¡Bienvenido al Juego!", font=("Helvetica", 20), bg="green", fg="white")
+titulo.pack(pady=30)
 
 # Crear el marcador en la ventana principal
 marcador_label = tk.Label(root, text=f"Marcador: {marcador}", font=("Helvetica", 16), bg="green", fg="white")
@@ -31,7 +31,7 @@ def nuevo_juego():
 
     # Crear una nueva ventana para el juego
     nueva_ventana = tk.Toplevel(root)
-    nueva_ventana.title("Nuevo Juego")
+    nueva_ventana.title("Nuevo Juego - Mosaico 4x4")
     nueva_ventana.geometry("400x500")
 
     # Crear una lista de 16 posiciones (4x4)
@@ -177,20 +177,19 @@ def key_press(event):
 def salir():
     root.quit()
 
-# Función para mostrar las instrucciones del juego
-def mostrar_instrucciones():
-    messagebox.showinfo("Cómo jugar", "Instrucciones del juego:\n\n1. Con las flechas del teclado combinas los mosaicos.\n2. Combina mosaicos del mismo numero para conseguir mas puntos.\n3. Combina la mayor cantidad de mosaicos para conseguir mas puntos.")
 
-# Botón para "Nuevo juego"
+def mostrar_instrucciones():
+    messagebox.showinfo("Cómo jugar",
+                        "Instrucciones del juego:\n\n1. Usa las flechas del teclado para mover los números.\n2. Si dos números iguales colisionan, se sumarán.\n3. Cada vez que muevas, aparecerá un nuevo '2' en una posición vacía.")
+
+
 boton_nuevo_juego = tk.Button(root, text="Nuevo Juego", font=("Helvetica", 14), command=nuevo_juego)
 boton_nuevo_juego.pack(pady=10)
 
-boton_como_jugar = tk.Button(root, text="Como Jugar", font=("Helvetica", 14), command=mostrar_instrucciones)
+boton_como_jugar = tk.Button(root, text="Cómo Jugar", font=("Helvetica", 14), command=mostrar_instrucciones)
 boton_como_jugar.pack(pady=10)
 
-# Botón para "Salir"
 boton_salir = tk.Button(root, text="Salir", font=("Helvetica", 14), command=salir)
 boton_salir.pack(pady=10)
 
-# Iniciar el bucle principal de la ventana
 root.mainloop()
