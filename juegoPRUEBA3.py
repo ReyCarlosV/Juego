@@ -10,7 +10,6 @@ root.config(bg="green")  # Cambiar el color de fondo de la ventana a verde
 
 # Variables globales
 posiciones_con_numeros = []
-posicion_vacia = None
 botones = {}
 
 # Etiqueta de título
@@ -20,7 +19,7 @@ titulo.pack(pady=30)
 
 # Funciones para los botones
 def nuevo_juego():
-    global posiciones_con_numeros, posicion_vacia, botones
+    global posiciones_con_numeros, botones
 
     # Crear una nueva ventana para el juego
     nueva_ventana = tk.Toplevel(root)
@@ -32,9 +31,6 @@ def nuevo_juego():
 
     # Seleccionar aleatoriamente dos posiciones para mostrar el número 2
     posiciones_con_numeros = random.sample(posiciones, 2)  # Dos números "2"
-
-    # Seleccionar una posición para el espacio vacío
-    posicion_vacia = random.choice([pos for pos in posiciones if pos not in posiciones_con_numeros])
 
     # Crear un mosaico de 4x4 botones
     for fila in range(4):
@@ -50,44 +46,51 @@ def nuevo_juego():
 
 
 def mover_todos(direccion):
-    global posiciones_con_numeros, posicion_vacia
+    global posiciones_con_numeros
 
-    fila_vacia, columna_vacia = posicion_vacia
-
-    if direccion == "Up" and fila_vacia < 3:  # El espacio vacío debe estar por debajo
-        fila_a_mover = fila_vacia + 1
-        if (fila_a_mover, columna_vacia) in posiciones_con_numeros:
-            mover_boton(fila_a_mover, columna_vacia)
-
-    elif direccion == "Down" and fila_vacia > 0:  # El espacio vacío debe estar por encima
-        fila_a_mover = fila_vacia - 1
-        if (fila_a_mover, columna_vacia) in posiciones_con_numeros:
-            mover_boton(fila_a_mover, columna_vacia)
-
-    elif direccion == "Left" and columna_vacia < 3:  # El espacio vacío debe estar a la derecha
-        columna_a_mover = columna_vacia + 1
-        if (fila_vacia, columna_a_mover) in posiciones_con_numeros:
-            mover_boton(fila_vacia, columna_a_mover)
-
-    elif direccion == "Right" and columna_vacia > 0:  # El espacio vacío debe estar a la izquierda
-        columna_a_mover = columna_vacia - 1
-        if (fila_vacia, columna_a_mover) in posiciones_con_numeros:
-            mover_boton(fila_vacia, columna_a_mover)
+    if direccion == "Up":
+        mover_numeros(-1, 0)  # Mover hacia arriba
+    elif direccion == "Down":
+        mover_numeros(1, 0)  # Mover hacia abajo
+    elif direccion == "Left":
+        mover_numeros(0, -1)  # Mover hacia la izquierda
+    elif direccion == "Right":
+        mover_numeros(0, 1)  # Mover hacia la derecha
 
 
-def mover_boton(fila_a_mover, columna_a_mover):
-    global posiciones_con_numeros, posicion_vacia
+def mover_numeros(delta_fila, delta_columna):
+    global posiciones_con_numeros
 
-    # Mover el número "2" al espacio vacío
-    botones[(fila_a_mover, columna_a_mover)]["text"] = ""  # Vaciar el botón que tiene "2"
-    botones[posicion_vacia]["text"] = "2"  # Poner "2" en la posición vacía
+    # Para cada número "2", intentamos moverlo en la dirección indicada
+    nuevas_posiciones = []
+    for fila, columna in posiciones_con_numeros:
+        nueva_fila = fila
+        nueva_columna = columna
 
-    # Actualizar las posiciones
-    posiciones_con_numeros.remove((fila_a_mover, columna_a_mover))
-    posiciones_con_numeros.append(posicion_vacia)
+        # Seguir moviendo hasta encontrar un límite o un obstáculo
+        while True:
+            siguiente_fila = nueva_fila + delta_fila
+            siguiente_columna = nueva_columna + delta_columna
 
-    # Actualizar la nueva posición vacía
-    posicion_vacia = (fila_a_mover, columna_a_mover)
+            if 0 <= siguiente_fila < 4 and 0 <= siguiente_columna < 4 and (
+            siguiente_fila, siguiente_columna) not in nuevas_posiciones:
+                nueva_fila = siguiente_fila
+                nueva_columna = siguiente_columna
+            else:
+                break
+
+        # Almacenar la nueva posición del número "2"
+        nuevas_posiciones.append((nueva_fila, nueva_columna))
+
+    # Actualizar los botones visualmente
+    for fila, columna in posiciones_con_numeros:
+        botones[(fila, columna)]["text"] = ""  # Vaciar las posiciones anteriores
+
+    for nueva_fila, nueva_columna in nuevas_posiciones:
+        botones[(nueva_fila, nueva_columna)]["text"] = "2"  # Actualizar nuevas posiciones
+
+    # Actualizar la lista de posiciones con los nuevos lugares de los números
+    posiciones_con_numeros = nuevas_posiciones
 
 
 def key_press(event):
@@ -102,7 +105,7 @@ def salir():
 # Función para mostrar las instrucciones del juego
 def mostrar_instrucciones():
     messagebox.showinfo("Cómo jugar",
-                        "Instrucciones del juego:\n\n1. Usa las flechas del teclado para mover los números '2' hacia el espacio vacío.\n2. ¡Gana el juego!")
+                        "Instrucciones del juego:\n\n1. Usa las flechas del teclado para mover los números '2'.\n2. ¡Gana el juego moviendo los números!")
 
 
 # Botón para "Nuevo juego"

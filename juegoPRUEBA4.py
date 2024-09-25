@@ -1,24 +1,23 @@
 import tkinter as tk
-from tkinter import messagebox
 import random
-
-# Variables globales
-posiciones_con_numeros = []
-botones = {}
+from tkinter import messagebox
 
 # Crear la ventana principal
 root = tk.Tk()
-root.title("2048")
-root.geometry("820x460")  # Tamaño de la ventana
+root.title("Portada de Inicio")
+root.geometry("400x300")  # Tamaño de la ventana
+root.config(bg="green")  # Cambiar el color de fondo de la ventana a verde
 
-# Cambiar el color de fondo de la ventana a verde
-root.config(bg="green")
+# Variables globales
+posiciones_con_numeros = {}
+botones = {}
 
 # Etiqueta de título
-titulo = tk.Label(root, text="¡Bienvenido a mi 2048!", font=("Helvetica", 20), bg="green", fg="white")
-titulo.pack(pady=50)
+titulo = tk.Label(root, text="¡Bienvenido al Juego!", font=("Helvetica", 20), bg="green", fg="white")
+titulo.pack(pady=30)
 
-# Funciones vacías para los botones
+
+# Funciones para los botones
 def nuevo_juego():
     global posiciones_con_numeros, botones
 
@@ -86,7 +85,7 @@ def mover_numeros(delta_fila, delta_columna):
                 if 0 <= siguiente_fila < 4 and 0 <= siguiente_columna < 4:
                     if (siguiente_fila, siguiente_columna) in nuevas_posiciones and nuevas_posiciones[
                         (siguiente_fila, siguiente_columna)] == posiciones_con_numeros[(fila, columna)] and (
-                            siguiente_fila, siguiente_columna) not in sumado:
+                    siguiente_fila, siguiente_columna) not in sumado:
                         # Si colisionan dos números iguales, los sumamos
                         nuevas_posiciones[(siguiente_fila, siguiente_columna)] *= 2
                         sumado.add((siguiente_fila, siguiente_columna))  # Marcar como sumado
@@ -118,22 +117,28 @@ def mover_numeros(delta_fila, delta_columna):
     # Actualizar las posiciones de los números
     posiciones_con_numeros = nuevas_posiciones
 
+
 def key_press(event):
     if event.keysym in ['Up', 'Down', 'Left', 'Right']:
         mover_todos(event.keysym)
 
+
 def salir():
     root.quit()
 
+
 # Función para mostrar las instrucciones del juego
 def mostrar_instrucciones():
-    messagebox.showinfo("Cómo jugar", "Instrucciones del juego:\n\n1. Con las flechas del teclado combinas los mosaicos.\n2. Combina mosaicos del mismo numero para conseguir mas puntos.\n3. Combina la mayor cantidad de mosaicos para conseguir mas puntos.")
+    messagebox.showinfo("Cómo jugar",
+                        "Instrucciones del juego:\n\n1. Usa las flechas del teclado para mover los números.\n2. Si dos números iguales colisionan, se sumarán.")
+
 
 # Botón para "Nuevo juego"
 boton_nuevo_juego = tk.Button(root, text="Nuevo Juego", font=("Helvetica", 14), command=nuevo_juego)
 boton_nuevo_juego.pack(pady=10)
 
-boton_como_jugar = tk.Button(root, text="Como Jugar", font=("Helvetica", 14), command=mostrar_instrucciones)
+# Botón para "Cómo jugar"
+boton_como_jugar = tk.Button(root, text="Cómo Jugar", font=("Helvetica", 14), command=mostrar_instrucciones)
 boton_como_jugar.pack(pady=10)
 
 # Botón para "Salir"
